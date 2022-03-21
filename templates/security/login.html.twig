@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+    <main class="container m-auto">
+{#        {% include 'common/flashbag.html.twig' %}#}
+        <div class="mw-350px mx-auto">
+            {% if error %}
+                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+            {% if app.user %}
+                <div class="mb-3">
+                    Vous êtes connecté en tant que {{ app.user.email }}, <a href="{{ path('app_logout') }}">Se déconnecter</a>
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-container mw-350px m-auto">
+            <h3 class="mb-3">S'identifier</h3>
+            <form method="post">
+                <fieldset class="mb-2">
+                    <label class="mb-1" for="inputEmail">Adresse e-mail</label>
+                    <input class="form-control" type="email" name="email" id="inputEmail" value="{{ last_username }}" autocomplete="email" required autofocus>
+                </fieldset>
+                <fieldset class="mb-2">
+                    <label class="mb-1" for="inputPassword">Mot de passe</label>
+                    <input class="form-control" type="password" name="password" id="inputPassword" autocomplete="current-password" required>
+                </fieldset>
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                {#
+                Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
+                See https://symfony.com/doc/current/security/remember_me.html
+
+                <div class="checkbox mb-3">
+                    <label>
+                        <input type="checkbox" name="_remember_me"> Remember me
+                    </label>
+                </div>
+                #}
+
+                <button class="btn btn-primary mt-3 w-100" type="submit">S'identifier</button>
+            </form>
+        </div>
+        <div class="mt-4 divider-break mw-350px mx-auto">
+            <h5>Vous êtes nouveau ?</h5>
+        </div>
+        <div class="mw-350px mx-auto">
+            <a class="btn btn-outline-primary w-100" href="#">Créer votre compte</a>
+        </div>
+    </main>
+{% endblock %}
