@@ -4,7 +4,7 @@
 
 {% block body %}
     <main class="container m-auto">
-{#        {% include 'common/flashbag.html.twig' %}#}
+        {% include 'common/flashbag.html.twig' %}
         <div class="mw-350px mx-auto">
             {% if error %}
                 <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>

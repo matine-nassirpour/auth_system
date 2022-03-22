@@ -27,7 +27,7 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=180, unique=true)
      * @Assert\NotBlank(message="Veuillez saisir une valeur")
-     * @Assert\Email(message="L\'email {{ value }} n\'est pas valide")
+     * @Assert\Email(message="L'email {{ value }} n'est pas valide")
      */
     private string $email;
 

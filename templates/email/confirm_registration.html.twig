@@ -1,0 +1,12 @@
+<h1>Confirmation de votre adresse e-mail</h1>
+<div>
+    <p>
+        Pour activer votre compte, veuillez confirmer votre adresse e-mail en cliquant sur le lien suivant :
+    </p>
+    <a href="{{ absolute_url(path('app_verify_account', {'id': userId, 'token': registrationToken})) }}">Confirmer</a>
+    <p>
+        Ce lien expire le {{ tokenLifeTime }}.
+    </p>
+</div>
+<br>
+<img src="{{ email.image('@images/logo_chatelet.png') }}" alt="logo chatelet">
