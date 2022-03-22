@@ -6,55 +6,87 @@ use App\Repository\UserRepository;
 use DateInterval;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: 'users')]
+/**
+ * @ORM\Entity(repositoryClass=UserRepository::class)
+ * @ORM\Table(name="users")
+ * @UniqueEntity(fields={"email"}, message="Impossible de créer un compte avec cet e-mail")
+ */
 class User implements UserInterface
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column(type: 'integer')]
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     * @ORM\Column(type="integer")
+     */
     private int $id;
 
-    #[ORM\Column(type: 'string', length: 180, unique: true)]
+    /**
+     * @ORM\Column(type="string", length=180, unique=true)
+     * @Assert\NotBlank(message="Veuillez saisir une valeur")
+     * @Assert\Email(message="L\'email {{ value }} n\'est pas valide")
+     */
     private string $email;
 
-    /** @var array<string> */
-    #[ORM\Column(type: 'json')]
+    /**
+     * @var string[]
+     * @ORM\Column(type="json")
+     */
     private array $roles = [];
 
     /**
-     * @var string The hashed password
+     * @var string
      * @ORM\Column(type="string")
+     * @Assert\NotBlank(message="Veuillez saisir une valeur")
      */
     private string $password;
 
-    #[ORM\Column(type: 'datetime_immutable')]
+    /**
+     * @ORM\Column(type="datetime_immutable")
+     */
     private DateTimeImmutable $registeredAt;
 
-    #[ORM\Column(type: 'datetime_immutable')]
+    /**
+     * @ORM\Column(type="datetime_immutable")
+     */
     private DateTimeImmutable $accountMustBeVerifiedBefore;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
     private ?string $registrationToken;
 
-    #[ORM\Column(type: 'boolean')]
+    /**
+     * @ORM\Column(type="boolean")
+     */
     private bool $isVerified;
 
-    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     */
     private ?DateTimeImmutable $accountVerifiedAt;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
     private ?string $forgotPasswordToken;
 
-    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     */
     private ?DateTimeImmutable $forgotPasswordTokenRequestedAt;
 
-    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     */
     private ?DateTimeImmutable $forgotPasswordTokenMustBeVerifiedBefore;
 
-    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    /**
+     * @ORM\Column(type="datetime_immutable", nullable=true)
+     */
     private ?DateTimeImmutable $forgotPasswordTokenVerifiedAt;
 
     public function __construct()
