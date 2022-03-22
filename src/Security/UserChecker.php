@@ -9,21 +9,21 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class UserChecker implements UserCheckerInterface
 {
-    public function checkPreAuth(UserInterface $user)
+    public function checkPreAuth(UserInterface $user): void
     {
-        if (!$user instanceof User) {
-            return;
-        }
+//        if (!$user instanceof User) {
+//            return;
+//        }
     }
 
-    public function checkPostAuth(UserInterface $user)
+    public function checkPostAuth(UserInterface $user): void
     {
         if (!$user instanceof User) {
             return;
         }
 
-//        if (!$user->getIsVerified()) {
-//            throw new CustomUserMessageAccountStatusException('Votre compte n\'est pas actif, veuillez consulter vos e-mail pour l\'activer avant le ' . $user->getAccountMustBeVerifiedBefore()->format('d/m/Y à H\hi'));
-//        }
+        if (!$user->getIsVerified()) {
+            throw new CustomUserMessageAccountStatusException('Votre compte n\'est pas actif, veuillez consulter vos e-mail pour l\'activer avant le ' . $user->getAccountMustBeVerifiedBefore()->format('d/m/Y à H\hi'));
+        }
     }
 }
