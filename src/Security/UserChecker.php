@@ -17,7 +17,8 @@ class UserChecker implements UserCheckerInterface
 
     public function __construct(
         RequestStack $requestStack,
-        SendEmail $sendEmail)
+        SendEmail $sendEmail
+    )
     {
         $this->requestStack = $requestStack;
         $this->sendEmail = $sendEmail;
