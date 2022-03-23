@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Espace utilisateur{% endblock %}
+
+{% block body %}
+    <main class="container text-center mt-3">
+        <section class="table-responsive">
+            <h1 class="mt-5 mb-3">Mon compte utilisateur</h1>
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <th>Email</th>
+                    <th>Mot de passe</th>
+                    <th>Activer la vérification d'adresse IP à l'authentification</th>
+                    <th>Mes adresses IP</th>
+                </thead>
+                <tbody>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <a class="btn btn-sm btn-warning m-3" href="#">Modifier mon mot de passe</a>
+                    </td>
+                    <td>
+                        <fieldset class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="check_user_ip" data-url="{{ path('app_user_profile_toggle_checking_ip') }}" {{ user.isGuardCheckIp ? 'checked' : null }}>
+                            <label class="form-check-label" for="check_user_ip">{{ user.isGuardCheckIp ? 'Active' : 'Inactive' }}</label>
+                        </fieldset>
+                    </td>
+                    <td>
+                        <p id="user_ip_addresses">{{ user.whitelistedIpAddresses|join(' | ') }}</p>
+                        <button class="btn btn-sm btn-warning m-3" type="button" id="add_current_ip_to_whitelist" data-url="{{ path('app_user_profile_add_ip') }}">Ajouter mon adresse IP actuelle</button>
+                    </td>
+                </tbody>
+            </table>
+        </section>
+    </main>
+{% endblock %}

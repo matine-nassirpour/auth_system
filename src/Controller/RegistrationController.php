@@ -26,7 +26,7 @@ class RegistrationController extends AbstractController
     }
 
     /**
-     * @Route("/register", name="app_register")
+     * @Route("/register", name="app_register", methods={"GET", "POST"})
      * @throws TransportExceptionInterface
      */
     public function register(
