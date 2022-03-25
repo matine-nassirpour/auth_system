@@ -3,6 +3,12 @@
 namespace App\EventSubscriber;
 
 use App\Entity\User;
+use App\Repository\AuthLogRepository;
+use App\Security\BruteForceChecker;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -19,14 +25,20 @@ use Symfony\Component\Security\Http\SecurityEvents;
 
 class AuthenticatorSubscriber implements EventSubscriberInterface
 {
+    private AuthLogRepository $authLogRepository;
+    private BruteForceChecker $bruteForceChecker;
     private LoggerInterface $securityLogger;
     private RequestStack $requestStack;
 
     public function __construct(
+        AuthLogRepository $authLogRepository,
+        BruteForceChecker $bruteForceChecker,
         LoggerInterface $securityLogger,
         RequestStack $requestStack
     )
     {
+        $this->authLogRepository = $authLogRepository;
+        $this->bruteForceChecker = $bruteForceChecker;
         $this->securityLogger = $securityLogger;
         $this->requestStack = $requestStack;
     }
@@ -46,6 +58,12 @@ class AuthenticatorSubscriber implements EventSubscriberInterface
         ];
     }
 
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
     public function onSecurityAuthenticationFailure(AuthenticationFailureEvent $event): void
     {
         ['user_ip' => $userIp] = $this->getRouteNameAndUserIp();
@@ -54,6 +72,8 @@ class AuthenticatorSubscriber implements EventSubscriberInterface
         ['email' => $emailEntered] = $securityToken->getCredentials();
 
         $this->securityLogger->info('Un utilisateur ayant l\'adresse IP ' . $userIp . ' a tenté de s\'authentifier sans succès avec l\'email suivant : ' . $emailEntered . ' :-)');
+
+        $this->bruteForceChecker->addFailedAuthAttempt($emailEntered, $userIp);
     }
 
     public function onSecurityAuthenticationSuccess(AuthenticationSuccessEvent $event): void
@@ -74,6 +94,10 @@ class AuthenticatorSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
     public function onSecurityInteractiveLogin(InteractiveLoginEvent $event): void
     {
         ['user_ip' => $userIp] = $this->getRouteNameAndUserIp();
@@ -81,7 +105,17 @@ class AuthenticatorSubscriber implements EventSubscriberInterface
         $securityToken = $event->getAuthenticationToken();
         $userEmail = $this->getUserEmail($securityToken);
 
-        $this->securityLogger->info('Connexion interactive ! Un utilisateur ayant l\'adresse IP ' . $userIp . ' a évolué en entité User avec l\'email ' . $userEmail . ' :-)');
+        $request = $this->requestStack->getCurrentRequest();
+
+        if ($request && $request->cookies->get('REMEMBER_ME')) {
+//            $this->securityLogger->info('Connexion avec REMEMBER_ME cookie ! Un utilisateur ayant l\'adresse IP ' . $userIp . ' a évolué en entité User avec l\'email ' . $userEmail . ' :-)');
+
+            $this->authLogRepository->addSuccessfulAuthAttempt($userEmail, $userIp, true);
+        } else {
+            $this->securityLogger->info('Connexion interactive ! Un utilisateur ayant l\'adresse IP ' . $userIp . ' a évolué en entité User avec l\'email ' . $userEmail . ' :-)');
+
+            $this->authLogRepository->addSuccessfulAuthAttempt($userEmail, $userIp);
+        }
 
     }
 
